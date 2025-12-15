@@ -1,0 +1,76 @@
+{
+  "placeholderImages": [
+    {
+      "id": "stream-1",
+      "description": "A person cooking in a vibrant market",
+      "imageUrl": "https://images.unsplash.com/photo-1662899311670-7e6bbe986166?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYXJrZXQlMjBmb29kfGVufDB8fHx8MTc2NTQzODQ2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "market food"
+    },
+    {
+      "id": "stream-2",
+      "description": "A beautiful natural landscape",
+      "imageUrl": "https://images.unsplash.com/photo-1610552050890-fe99536c2615?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxuYXR1cmUlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzY1Mzk1NTIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nature landscape"
+    },
+    {
+      "id": "stream-3",
+      "description": "A person crafting pottery",
+      "imageUrl": "https://images.unsplash.com/photo-1642582652798-100fb79fdc31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwb3R0ZXJ5JTIwY3JhZnR8ZW58MHx8fHwxNzY1NDM4NDY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pottery craft"
+    },
+    {
+      "id": "stream-4",
+      "description": "A city street at night",
+      "imageUrl": "https://images.unsplash.com/photo-1708474660686-7a00a0ffe4ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2l0eSUyMG5pZ2h0fGVufDB8fHx8MTc2NTM1ODEzM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city night"
+    },
+    {
+      "id": "stream-5",
+      "description": "A close-up of a traditional dish",
+      "imageUrl": "https://images.unsplash.com/photo-1668868325520-a63841b108fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0cmFkaXRpb25hbCUyMGZvb2R8ZW58MHx8fHwxNzY1NDM4NDYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "traditional food"
+    },
+    {
+      "id": "profile-1",
+      "description": "A portrait of a person smiling",
+      "imageUrl": "https://images.unsplash.com/photo-1635131902146-6957477a4ff4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc2NTQxNTMwNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person smiling"
+    },
+    {
+      "id": "profile-2",
+      "description": "A portrait of a person in nature",
+      "imageUrl": "https://images.unsplash.com/photo-1524494860062-9442631ee30e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBuYXR1cmV8ZW58MHx8fHwxNzY1MzQ1MTgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person nature"
+    },
+    {
+      "id": "profile-3",
+      "description": "A portrait of an artist",
+      "imageUrl": "https://images.unsplash.com/photo-1745165549821-7382d2e740d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhcnRpc3QlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjU0MjMwNjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "artist portrait"
+    },
+    {
+      "id": "profile-4",
+      "description": "A portrait of a traveler",
+      "imageUrl": "https://images.unsplash.com/photo-1496440459387-85ced90156f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cmF2ZWxlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc2NTQzODQ2NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "traveler portrait"
+    },
+    {
+      "id": "profile-5",
+      "description": "A chef in a kitchen",
+      "imageUrl": "https://images.unsplash.com/photo-1621494547944-5ddbc84514b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaGVmJTIwa2l0Y2hlbnxlbnwwfHx8fDE3NjUzMjY4Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chef kitchen"
+    },
+    {
+      "id": "game-1",
+      "description": "Street photography in Tokyo",
+      "imageUrl": "https://images.unsplash.com/photo-1723041472683-dd4b9cf30d26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0b2t5byUyMHN0cmVldHxlbnwwfHx8fDE3NjUzNTU0MDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tokyo street"
+    },
+    {
+      "id": "event-1",
+      "description": "People at a workshop",
+      "imageUrl": "https://images.unsplash.com/photo-1759456629213-3db5a7bb53ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3b3Jrc2hvcCUyMGNsYXNzfGVufDB8fHx8MTc2NTQzODQ2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "workshop class"
+    }
+  ]
+}

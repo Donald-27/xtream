@@ -1,0 +1,161 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    function isStreamOwner(streamId) {
+      return isSignedIn() && get(/databases/$(database)/documents/streams/$(streamId)).data.userId == request.auth.uid;
+    }
+    function isChatParticipant(chatId) {
+        return isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds;
+    }
+
+    // ----------------------------------------------------------------------
+    // Collection Rules
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Manages user profiles. Only the profile owner can write to their
+     *              document. Individual profiles can be read by anyone, but the
+     *              entire collection of users cannot be listed.
+     */
+    match /users/{userId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+    
+    /**
+     * @description A collection of unique usernames to prevent duplicates.
+     *              Users can create a document for their username, but cannot
+     *              update or delete it (handled by server-side logic).
+     */
+    match /usernames/{username} {
+        allow get: if true;
+        allow list: if false;
+        allow create: if isSignedIn();
+        allow update, delete: if false; // Username changes are handled by backend logic
+    }
+    
+    /**
+     * @description Stores user locations for the discovery feature.
+     *              - Users can only read/write their own location document.
+     *              - Authenticated users can list locations to find others nearby.
+     */
+    match /locations/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create, update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    /**
+     * @description Manages streams. Publicly readable by authenticated users.
+     *              Writes are restricted to the owner.
+     */
+    match /streams/{streamId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    /**
+     * @description Manages posts (clips). Publicly readable by authenticated users.
+     *              Writes are restricted to the owner.
+     */
+    match /posts/{postId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.creatorId == request.auth.uid;
+      allow update: if isOwner(resource.data.creatorId);
+      allow delete: if isOwner(resource.data.creatorId);
+    }
+
+    /**
+     * @description Manages events. Publicly readable. Writes are restricted to the owner.
+     */
+    match /events/{eventId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.organizerId == request.auth.uid;
+      allow update: if isOwner(resource.data.organizerId) && request.resource.data.organizerId == resource.data.organizerId;
+      allow delete: if isOwner(resource.data.organizerId);
+    }
+
+     /**
+     * @description Manages challenges. Publicly readable. Creation is for signed-in users.
+     *              Modification/deletion restricted to creator.
+     */
+    match /challenges/{challengeId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.creatorId == request.auth.uid;
+      allow update: if isOwner(resource.data.creatorId);
+      allow delete: if isOwner(resource.data.creatorId);
+
+      /**
+       * @description Manages challenge entries. Publicly readable.
+       *              Creation is for signed-in users. Update/delete restricted to entry owner.
+       */
+      match /entries/{entryId} {
+        allow get, list: if true;
+        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isOwner(resource.data.userId);
+      }
+    }
+
+     /**
+     * @description Manages beacons for spontaneous meetups.
+     */
+    match /beacons/{beaconId} {
+        allow get, list: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.creatorId == request.auth.uid;
+        allow update: if isOwner(resource.data.creatorId); // Allow owner to update (e.g., extend time)
+        allow delete: if isOwner(resource.data.creatorId); // Allow owner to cancel
+    }
+
+
+    /**
+     * @description Manages groups. Publicly readable. Creation is allowed for signed-in users.
+     *              Modification and deletion are disabled pending a clear ownership model.
+     */
+    match /groups/{groupId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.memberUserIds;
+      allow update, delete: if false; // TODO: Implement owner/admin roles for secure writes.
+    }
+
+    /**
+     * @description Manages chat channels and their messages.
+     */
+    match /chats/{chatId} {
+      allow get: if isChatParticipant(chatId);
+      allow list: if false; // Do not allow listing all chats
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participantIds;
+      allow update: if isChatParticipant(chatId); // e.g., to add/remove participants
+
+       /**
+       * @description Manages chat messages within a chat.
+       *              Only participants of the chat can read or write messages.
+       */
+      match /messages/{messageId} {
+        allow list, get: if isChatParticipant(chatId);
+        allow create: if isChatParticipant(chatId) && request.resource.data.senderId == request.auth.uid;
+        allow update: if isChatParticipant(chatId) && resource.data.senderId == request.auth.uid;
+        allow delete: if isChatParticipant(chatId) && resource.data.senderId == request.auth.uid;
+      }
+    }
+  }
+}

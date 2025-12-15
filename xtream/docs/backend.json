@@ -1,0 +1,134 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's profile within the application.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the user profile." },
+        "username": { "type": "string", "description": "The user's chosen username (unique)." },
+        "email": { "type": "string", "description": "The user's email address (unique)." },
+        "displayName": { "type": "string", "description": "The user's display name, which can be different from their username." },
+        "bio": { "type": "string", "description": "A short biography or description of the user." },
+        "location": { "type": "string", "description": "The user's general location (e.g., city, country)." },
+        "profilePictureUrl": { "type": "string", "description": "URL of the user's profile picture.", "format": "uri" },
+        "coverPhotoUrl": { "type": "string", "description": "URL of the user's cover photo.", "format": "uri" },
+        "isVerified": { "type": "boolean", "description": "Indicates if the user's email has been verified." },
+        "usernameLastChanged": { "type": "string", "format": "date-time", "description": "Timestamp of when the username was last changed." },
+        "qrCodeData": { "type": "string", "description": "Secret data for generating device-linking QR codes." },
+        "followerIds": { "type": "array", "items": { "type": "string" }, "description": "List of user IDs who follow this user." },
+        "followingIds": { "type": "array", "items": { "type": "string" }, "description": "List of user IDs this user is following." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the user account was created." },
+        "blockedUserIds": { "type": "array", "items": { "type": "string" }, "description": "A list of user IDs that this user has blocked." },
+        "defaultStreamCategory": { "type": "string", "description": "The user's default category for new streams." },
+        "discoveryRadius": { "type": "number", "description": "The user's preferred radius (in kilometers) for location-based discovery." },
+        "lifetimeGold": { "type": "number", "description": "Total number of 'Gold' reactions a user has received across all their content." }
+      },
+      "required": ["id", "email", "username"]
+    },
+    "UserLocation": {
+      "title": "UserLocation",
+      "type": "object",
+      "description": "Represents a user's discoverable location.",
+      "properties": {
+        "geohash": { "type": "string", "description": "The geohash of the user's location." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of the last location update." }
+      },
+      "required": ["geohash", "updatedAt"]
+    },
+    "Stream": { "$ref": "#/definitions/Stream" },
+    "Event": { "$ref": "#/definitions/Event" },
+    "Challenge": { "$ref": "#/definitions/Challenge" },
+    "ChallengeEntry": { "$ref": "#/definitions/ChallengeEntry" },
+    "Beacon": { "$ref": "#/definitions/Beacon" },
+    "Group": { "$ref": "#/definitions/Group" },
+    "Chat": { "$ref": "#/definitions/Chat" },
+    "ChatMessage": { "$ref": "#/definitions/ChatMessage" },
+    "Post": { "$ref": "#/definitions/Post" }
+  },
+   "definitions": {
+    "Stream": {
+      "title": "Stream", "type": "object", "description": "Represents a live or archived stream.", "properties": { "id": { "type": "string" }, "userId": { "type": "string" }, "title": { "type": "string" }, "description": { "type": "string" }, "category": { "type": "string" }, "tags": { "type": "array", "items": { "type": "string" } }, "streamUrl": { "type": "string", "format": "uri" }, "thumbnailUrl": { "type": "string", "format": "uri" }, "startTime": { "type": "string", "format": "date-time" }, "endTime": { "type": "string", "format": "date-time" }, "isLive": { "type": "boolean" }, "viewerCount": { "type": "number" }, "allowCoStreaming": { "type": "boolean", "default": false, "description": "Whether the stream owner allows others to request to join." }, "coStreamerIds": { "type": "array", "items": { "type": "string" }, "description": "List of user IDs who are co-streaming." }, "joinRequests": { "type": "array", "items": { "type": "string" }, "description": "List of user IDs requesting to join the stream." }, "reactions": { "type": "object", "properties": { "spark": { "type": "number" }, "brightIdea": { "type": "number" }, "support": { "type": "number" }, "gold": { "type": "number" }, "grow": { "type": "number" } } } }, "required": ["id", "userId", "title", "category", "streamUrl", "thumbnailUrl", "startTime", "isLive"]
+    },
+    "Event": {
+      "title": "Event", "type": "object", "description": "Represents an event or meetup.", "properties": { "id": { "type": "string" }, "userId": { "type": "string" }, "title": { "type": "string" }, "description": { "type": "string" }, "eventType": { "type": "string" }, "startTime": { "type": "string", "format": "date-time" }, "endTime": { "type": "string", "format": "date-time" }, "location": { "type": "string" }, "maxAttendees": { "type": "number" }, "privacy": { "type": "string" }, "attendingUserIds": { "type": "array", "items": { "type": "string" } } }, "required": ["id", "userId", "title", "description", "eventType", "startTime", "location", "maxAttendees", "privacy"]
+    },
+    "Challenge": {
+      "title": "Challenge", "type": "object", "description": "Represents a creative challenge or contest.", "properties": { "id": { "type": "string" }, "creatorId": { "type": "string" }, "title": { "type": "string" }, "description": { "type": "string" }, "rules": { "type": "string" }, "submissionType": { "type": "string", "enum": ["photo", "video", "text"] }, "deadline": { "type": "string", "format": "date-time" }, "createdAt": { "type": "string", "format": "date-time" } }, "required": ["id", "creatorId", "title", "description", "submissionType", "deadline"]
+    },
+    "ChallengeEntry": {
+        "title": "ChallengeEntry", "type": "object", "description": "Represents a submission to a challenge.", "properties": { "id": { "type": "string" }, "challengeId": { "type": "string" }, "userId": { "type": "string" }, "contentUrl": { "type": "string", "description": "URL to the photo/video or the text content itself.", "format": "uri" }, "textContent": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }, "reactions": { "type": "object", "properties": { "spark": { "type": "number" }, "brightIdea": { "type": "number" }, "support": { "type": "number" }, "gold": { "type": "number" }, "grow": { "type": "number" } } } }, "required": ["id", "challengeId", "userId", "createdAt"]
+    },
+    "Beacon": {
+        "title": "Beacon", "type": "object", "description": "Represents a spontaneous, short-lived meetup.", "properties": { "id": { "type": "string" }, "creatorId": { "type": "string" }, "location": { "type": "string", "description": "A description of the location, not coordinates." }, "purpose": { "type": "string" }, "expiresAt": { "type": "string", "format": "date-time" }, "createdAt": { "type": "string", "format": "date-time" }, "participantIds": { "type": "array", "items": { "type": "string" } } }, "required": ["id", "creatorId", "location", "purpose", "expiresAt"]
+    },
+    "Group": {
+      "title": "Group", "type": "object", "description": "Represents a community group.", "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "description": { "type": "string" }, "privacy": { "type": "string" }, "rules": { "type": "string" }, "categories": { "type": "array", "items": { "type": "string" } }, "tags": { "type": "array", "items": { "type": "string" } }, "locationFocus": { "type": "string" }, "memberUserIds": { "type": "array", "items": { "type": "string" } }, "eventIds": { "type": "array", "items": { "type": "string" } } }, "required": ["id", "name", "description", "privacy", "rules"]
+    },
+     "Chat": {
+      "title": "Chat", "type": "object", "description": "Represents a chat channel.", "properties": { "id": { "type": "string" }, "participantIds": { "type": "array", "items": { "type": "string" } }, "type": { "type": "string", "enum": ["direct", "group", "event", "game", "challenge", "beacon"] } }, "required": ["id", "participantIds", "type"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage", "type": "object", "description": "Represents a chat message.", "properties": { "id": { "type": "string" }, "senderId": { "type": "string" }, "content": { "type": "string" }, "timestamp": { "type": "string", "format": "date-time" }, "isMedia": { "type": "boolean" } }, "required": ["id", "senderId", "content", "timestamp"]
+    },
+     "Post": {
+      "title": "Post", "type": "object", "description": "Represents a clip or highlight created from a past stream.", "properties": { "id": { "type": "string" }, "creatorId": { "type": "string" }, "originalStreamId": { "type": "string" }, "title": { "type": "string" }, "videoUrl": { "type": "string", "format": "uri" }, "thumbnailUrl": { "type": "string", "format": "uri" }, "createdAt": { "type": "string", "format": "date-time" }, "reactions": { "type": "object", "properties": { "spark": { "type": "number" }, "brightIdea": { "type": "number" }, "support": { "type": "number" }, "gold": { "type": "number" }, "grow": { "type": "number" } } } }, "required": ["id", "creatorId", "originalStreamId", "videoUrl", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "google.com", "facebook.com"]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}", "definition": { "entityName": "UserProfile", "schema": { "$ref": "#/entities/UserProfile" } }
+      },
+      {
+        "path": "/usernames/{username}",
+        "definition": {
+          "description": "Maps unique lowercase usernames to user IDs for quick lookup and preventing duplicates.",
+          "properties": {
+            "userId": { "type": "string", "description": "The UID of the user who owns this username." }
+          }
+        }
+      },
+      {
+        "path": "/locations/{userId}",
+        "definition": { "entityName": "UserLocation", "schema": { "$ref": "#/entities/UserLocation" } }
+      },
+      {
+        "path": "/streams/{streamId}", "definition": { "entityName": "Stream", "schema": { "$ref": "#/definitions/Stream" } }
+      },
+       {
+        "path": "/posts/{postId}", "definition": { "entityName": "Post", "schema": { "$ref": "#/definitions/Post" } }
+      },
+      {
+        "path": "/events/{eventId}", "definition": { "entityName": "Event", "schema": { "$ref": "#/definitions/Event" } }
+      },
+       {
+        "path": "/challenges/{challengeId}",
+        "definition": { "entityName": "Challenge", "schema": { "$ref": "#/definitions/Challenge" } },
+        "subcollections": [
+          { "path": "entries/{entryId}", "definition": { "entityName": "ChallengeEntry", "schema": { "$ref": "#/definitions/ChallengeEntry" } } }
+        ]
+      },
+       {
+        "path": "/beacons/{beaconId}", "definition": { "entityName": "Beacon", "schema": { "$ref": "#/definitions/Beacon" } }
+      },
+      {
+        "path": "/groups/{groupId}", "definition": { "entityName": "Group", "schema": { "$ref": "#/definitions/Group" } }
+      },
+      {
+        "path": "/chats/{chatId}",
+        "definition": { "entityName": "Chat", "schema": { "$ref": "#/definitions/Chat" } },
+        "subcollections": [
+          { "path": "messages/{messageId}", "definition": { "entityName": "ChatMessage", "schema": { "$ref": "#/definitions/ChatMessage" } } }
+        ]
+      }
+    ]
+  }
+}
+
+    

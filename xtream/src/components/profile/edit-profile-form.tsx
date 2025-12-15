@@ -124,7 +124,7 @@ export function EditProfileForm() {
 
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!user || !firestore || !userProfile) {
+    if (!user || !firestore || !userProfile || !userDocRef) {
       toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to update your profile.' });
       return;
     }

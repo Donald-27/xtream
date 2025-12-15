@@ -10,8 +10,8 @@ interface LogoIconProps extends HTMLAttributes<HTMLDivElement> {
 
 export function LogoIcon({
   variant = "primary",
-  width = 48,
-  height = 48,
+  width = 80,
+  height = 80,
   className = "",
   ...props
 }: LogoIconProps) {

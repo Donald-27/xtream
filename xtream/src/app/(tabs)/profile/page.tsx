@@ -9,7 +9,7 @@ import { Settings, Share, Eye, Star, Users, Link as LinkIcon, Video, LogOut, Med
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleStreamDialog } from "@/components/schedule-stream-dialog";
 import { useUser, useAuth, useFirestore, useDoc, useCollection, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
-import { doc, collection, query, where, serverTimestamp, getDocs, limit } from 'firebase/firestore';
+import { doc, collection, query, where, serverTimestamp, getDocs, limit, orderBy } from 'firebase/firestore';
 import type { User as UserType, Stream, Post } from '@/lib/types';
 import { useRouter } from "next/navigation";
 import Link from "next/link";

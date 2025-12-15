@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  allowedDevOrigins: ['https://d6951edd-534c-4f76-a7c6-844ef4214d85-00-utckmz8vj77u.picard.replit.dev', 'http://127.0.0.1:5000', 'http://localhost:5000'],
   images: {
     remotePatterns: [
       {

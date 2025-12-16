@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSupabaseClient } from './provider';
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload, PostgrestFilterBuilder } from '@supabase/supabase-js';
+
+export { useSupabaseClient as useSupabase };
 
 export type WithId<T> = T & { id: string };
 
@@ -112,6 +114,78 @@ export function useCollection<T = any>(
       supabase.removeChannel(channel);
     };
   }, [optionsKey, supabase]);
+
+  return { data, isLoading, error };
+}
+
+export function useQuery<T = any>(
+  table: string | null,
+  queryBuilder?: (query: any) => any
+): UseCollectionResult<T> {
+  const supabase = useSupabaseClient();
+  const [data, setData] = useState<WithId<T>[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!table) {
+      setData(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const fetchData = async () => {
+      try {
+        let query = supabase.from(table).select('*');
+
+        if (queryBuilder) {
+          query = queryBuilder(query);
+        }
+
+        const { data: result, error: queryError } = await query;
+
+        if (queryError) {
+          setError(new Error(queryError.message));
+          setData(null);
+        } else {
+          setData(result as WithId<T>[]);
+          setError(null);
+        }
+      } catch (err: any) {
+        setError(err);
+        setData(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    const channel: RealtimeChannel = supabase
+      .channel(`${table}_query_changes`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table },
+        (payload: RealtimePostgresChangesPayload<any>) => {
+          if (payload.eventType === 'INSERT') {
+            setData(prev => prev ? [...prev, payload.new as WithId<T>] : [payload.new as WithId<T>]);
+          } else if (payload.eventType === 'UPDATE') {
+            setData(prev => prev?.map(item => item.id === payload.new.id ? payload.new as WithId<T> : item) ?? null);
+          } else if (payload.eventType === 'DELETE') {
+            setData(prev => prev?.filter(item => item.id !== payload.old.id) ?? null);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [table, supabase]);
 
   return { data, isLoading, error };
 }

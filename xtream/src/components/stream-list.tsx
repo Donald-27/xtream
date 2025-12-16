@@ -1,23 +1,15 @@
-
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, where } from 'firebase/firestore';
+import { useQuery } from "@/lib/supabase/hooks";
 import type { Stream } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 import { StreamCard } from "@/components/stream-card";
 
-// This component is now deprecated in favor of the combined feed on the home page,
-// but is kept to avoid breaking changes if it's imported elsewhere.
 export function StreamList() {
-  const firestore = useFirestore();
-  
-  const streamsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'streams'), orderBy('live', 'desc'));
-  }, [firestore]);
-
-  const { data: streams, isLoading } = useCollection<Stream>(streamsQuery);
+  const { data: streams, isLoading } = useQuery<Stream>(
+    'streams',
+    (query: any) => query.order('live', { ascending: false })
+  );
 
   if (isLoading) {
     return (
@@ -34,11 +26,9 @@ export function StreamList() {
 
   return (
     <div className="flex flex-col gap-8">
-      {streams && streams.map((stream) => (
+      {streams && streams.map((stream: Stream) => (
         <StreamCard key={stream.id} stream={stream} />
       ))}
     </div>
   );
 }
-
-    

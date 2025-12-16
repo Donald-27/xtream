@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,15 +17,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar, WandSparkles } from "lucide-react";
 import { suggestStreamTitle } from "@/ai/flows/suggest-stream-title";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useUser, addDocumentNonBlocking, useDoc, useMemoFirebase } from "@/firebase";
-import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { useUser } from "@/lib/supabase/provider";
+import { useSupabase, useDoc } from "@/lib/supabase/hooks";
+import { mapDbUserToUser } from "@/lib/types";
 import type { User } from "@/lib/types";
 
 export function ScheduleStreamDialog() {
   const { toast } = useToast();
-  const firestore = useFirestore();
+  const supabase = useSupabase();
   const { user } = useUser();
-  
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -35,19 +35,21 @@ export function ScheduleStreamDialog() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const userDocRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
+  const { data: rawUserProfile } = useDoc<any>(
+    user ? 'users' : null,
+    user?.id
+  );
 
-  const { data: userProfile } = useDoc<User>(userDocRef);
+  const userProfile = useMemo(() => {
+    if (!rawUserProfile) return null;
+    return mapDbUserToUser(rawUserProfile);
+  }, [rawUserProfile]);
 
   useEffect(() => {
     if (userProfile?.defaultStreamCategory && !category) {
       setCategory(userProfile.defaultStreamCategory);
     }
   }, [userProfile, category]);
-
 
   const handleSuggestTitle = async () => {
     if (!description) {
@@ -73,7 +75,7 @@ export function ScheduleStreamDialog() {
       }
     } catch (error) {
       console.error("Failed to suggest title:", error);
-       toast({
+      toast({
         title: "Error",
         description: "Could not generate a title suggestion. Please try again.",
         variant: "destructive",
@@ -84,7 +86,7 @@ export function ScheduleStreamDialog() {
   };
 
   const handleScheduleStream = async () => {
-    if (!user || !firestore) {
+    if (!user || !supabase) {
       toast({ variant: "destructive", title: "Not logged in", description: "You must be logged in to schedule a stream." });
       return;
     }
@@ -93,24 +95,25 @@ export function ScheduleStreamDialog() {
       return;
     }
 
-    const streamsCollection = collection(firestore, 'streams');
     try {
-      await addDocumentNonBlocking(streamsCollection, {
-        title,
-        category,
-        description, // Not in schema, but good to have
-        live: false,
-        startTime: new Date(startTime),
-        userId: user.uid,
-        viewerIds: [],
-        tags: [],
-        thumbnailUrl: 'stream-2', // Default placeholder
-        createdAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('streams')
+        .insert({
+          title,
+          category,
+          description,
+          live: false,
+          start_time: new Date(startTime).toISOString(),
+          user_id: user.id,
+          viewer_ids: [],
+          tags: [],
+          thumbnail_url: 'stream-2',
+        });
+
+      if (error) throw error;
 
       toast({ title: "Stream Scheduled!", description: "Your stream is now on the schedule." });
       setOpen(false);
-      // Reset form
       setTitle('');
       setDescription('');
       setCategory(userProfile?.defaultStreamCategory || '');
@@ -121,11 +124,10 @@ export function ScheduleStreamDialog() {
     }
   };
 
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="flex-1"><Calendar className="w-4 h-4 mr-2"/>SCHEDULE STREAM</Button>
+        <Button variant="secondary" className="flex-1"><Calendar className="w-4 h-4 mr-2" />SCHEDULE STREAM</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-secondary border-border">
         <DialogHeader>
@@ -148,20 +150,20 @@ export function ScheduleStreamDialog() {
           <div className="grid gap-2">
             <Label htmlFor="title">Stream Title</Label>
             <div className="flex gap-2">
-            <Input
-              id="title"
-              placeholder="e.g., 'My First Sourdough! 🍞'"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-background"
-            />
-            <Button variant="outline" size="icon" onClick={handleSuggestTitle} disabled={isGenerating} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex-shrink-0">
+              <Input
+                id="title"
+                placeholder="e.g., 'My First Sourdough!'"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="bg-background"
+              />
+              <Button variant="outline" size="icon" onClick={handleSuggestTitle} disabled={isGenerating} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex-shrink-0">
                 <WandSparkles className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
                 <span className="sr-only">Suggest Title</span>
-            </Button>
+              </Button>
             </div>
           </div>
-           <div className="grid gap-2">
+          <div className="grid gap-2">
             <Label htmlFor="category">Category</Label>
             <Input
               id="category"
@@ -171,7 +173,7 @@ export function ScheduleStreamDialog() {
               className="bg-background"
             />
           </div>
-           <div className="grid gap-2">
+          <div className="grid gap-2">
             <Label htmlFor="startTime">Schedule Time</Label>
             <Input
               id="startTime"

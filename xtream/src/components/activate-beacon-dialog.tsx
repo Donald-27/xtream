@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -16,16 +15,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioTower, WandSparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useUser, addDocumentNonBlocking, useDoc, useMemoFirebase } from "@/firebase";
-import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { useUser } from "@/lib/supabase/provider";
+import { useSupabase, useDoc } from "@/lib/supabase/hooks";
 import { findLocation } from "@/ai/flows/find-location";
 import { add } from "date-fns";
+import { mapDbUserToUser } from "@/lib/types";
+import { useMemo } from "react";
 
 export function ActivateBeaconDialog() {
   const { toast } = useToast();
-  const firestore = useFirestore();
+  const supabase = useSupabase();
   const { user } = useUser();
-  
+
   const [purpose, setPurpose] = useState("");
   const [location, setLocation] = useState("");
 
@@ -33,38 +34,41 @@ export function ActivateBeaconDialog() {
   const [isFindingLocation, setIsFindingLocation] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const userDocRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-  
-  const { data: userProfile } = useDoc(userDocRef);
+  const { data: rawUserProfile } = useDoc<any>(
+    user ? 'users' : null,
+    user?.id
+  );
+
+  const userProfile = useMemo(() => {
+    if (!rawUserProfile) return null;
+    return mapDbUserToUser(rawUserProfile);
+  }, [rawUserProfile]);
 
   const handleFindLocation = async () => {
     if (!userProfile?.location && !location) {
-        toast({ variant: 'destructive', title: 'Location needed', description: 'Please type a location to search for, or set one in your profile.' });
-        return;
+      toast({ variant: 'destructive', title: 'Location needed', description: 'Please type a location to search for, or set one in your profile.' });
+      return;
     }
     const query = location || userProfile?.location || '';
     setIsFindingLocation(true);
     try {
-        const result = await findLocation({ query });
-        if(result.formattedLocation) {
-            setLocation(result.formattedLocation);
-            toast({ title: 'Location Found!', description: `Set location to ${result.formattedLocation}` });
-        } else {
-            toast({ variant: 'destructive', title: 'Location not found' });
-        }
+      const result = await findLocation({ query });
+      if (result.formattedLocation) {
+        setLocation(result.formattedLocation);
+        toast({ title: 'Location Found!', description: `Set location to ${result.formattedLocation}` });
+      } else {
+        toast({ variant: 'destructive', title: 'Location not found' });
+      }
     } catch (error) {
-        console.error("Error finding location:", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not find location.' });
+      console.error("Error finding location:", error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not find location.' });
     } finally {
-        setIsFindingLocation(false);
+      setIsFindingLocation(false);
     }
   };
 
   const handleActivateBeacon = async () => {
-    if (!user || !firestore) {
+    if (!user || !supabase) {
       toast({ variant: "destructive", title: "Not logged in" });
       return;
     }
@@ -74,16 +78,18 @@ export function ActivateBeaconDialog() {
     }
     setIsActivating(true);
 
-    const beaconsCollection = collection(firestore, 'beacons');
     try {
-      await addDocumentNonBlocking(beaconsCollection, {
-        creatorId: user.uid,
-        purpose,
-        location,
-        expiresAt: add(new Date(), { hours: 1 }), // Beacon lasts for 1 hour
-        createdAt: serverTimestamp(),
-        participantIds: [user.uid],
-      });
+      const { error } = await supabase
+        .from('beacons')
+        .insert({
+          creator_id: user.id,
+          purpose,
+          location,
+          expires_at: add(new Date(), { hours: 1 }).toISOString(),
+          participant_ids: [user.id],
+        });
+
+      if (error) throw error;
 
       toast({ title: "Beacon Activated!", description: "Your beacon is now visible to nearby users." });
       setOpen(false);
@@ -101,8 +107,8 @@ export function ActivateBeaconDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-            <RadioTower className="mr-2 h-4 w-4" />
-            Activate Beacon
+          <RadioTower className="mr-2 h-4 w-4" />
+          Activate Beacon
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-secondary border-border">
@@ -126,19 +132,19 @@ export function ActivateBeaconDialog() {
           <div className="grid gap-2">
             <Label htmlFor="location">Location</Label>
             <div className="flex gap-2">
-                <Input
-                  id="location"
-                  placeholder="e.g., 'Central Park' or your profile location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="bg-background"
-                />
-                <Button variant="outline" size="icon" onClick={handleFindLocation} disabled={isFindingLocation} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex-shrink-0">
-                    <WandSparkles className={`h-4 w-4 ${isFindingLocation ? 'animate-spin' : ''}`} />
-                </Button>
+              <Input
+                id="location"
+                placeholder="e.g., 'Central Park' or your profile location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="bg-background"
+              />
+              <Button variant="outline" size="icon" onClick={handleFindLocation} disabled={isFindingLocation} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground flex-shrink-0">
+                <WandSparkles className={`h-4 w-4 ${isFindingLocation ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
-             <p className="text-xs text-muted-foreground">
-                Defaults to your profile location if left blank.
+            <p className="text-xs text-muted-foreground">
+              Defaults to your profile location if left blank.
             </p>
           </div>
         </div>
@@ -151,5 +157,3 @@ export function ActivateBeaconDialog() {
     </Dialog>
   );
 }
-
-    

@@ -1,60 +1,48 @@
-
 'use client';
 import { AppHeader } from "@/components/layout/app-header";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy } from 'firebase/firestore';
+import { useCollection } from "@/lib/supabase/hooks";
+import { useMemo } from "react";
 import type { Stream, Post } from '@/lib/types';
+import { mapDbStreamToStream, mapDbPostToPost } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 import { StreamCard } from "@/components/stream-card";
 import { PostCard } from "@/components/post-card";
 import { StoriesCarousel } from "@/components/stories-carousel";
-import { useMemo } from "react";
 
-// Union type for the feed
 type FeedItem = (Stream & { type: 'stream' }) | (Post & { type: 'post' });
 
 export default function Home() {
-  const firestore = useFirestore();
-  
-  const streamsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'streams'), orderBy('live', 'desc'), orderBy('startTime', 'desc'));
-  }, [firestore]);
+  const { data: rawStreams, isLoading: isLoadingStreams } = useCollection({
+    table: 'streams',
+    orderBy: { column: 'live', ascending: false },
+    orderBySecondary: { column: 'start_time', ascending: false },
+  });
 
-  const postsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'posts'), orderBy('createdAt', 'desc'));
-  }, [firestore]);
-
-  const { data: streams, isLoading: isLoadingStreams } = useCollection<Stream>(streamsQuery);
-  const { data: posts, isLoading: isLoadingPosts } = useCollection<Post>(postsQuery);
+  const { data: rawPosts, isLoading: isLoadingPosts } = useCollection({
+    table: 'posts',
+    orderBy: { column: 'created_at', ascending: false },
+  });
 
   const feedItems = useMemo((): FeedItem[] => {
     const combined: FeedItem[] = [];
 
-    if (streams) {
-      combined.push(...streams.map(s => ({ ...s, type: 'stream' as const })));
+    if (rawStreams) {
+      combined.push(...rawStreams.map(s => ({ ...mapDbStreamToStream(s), type: 'stream' as const })));
     }
-    if (posts) {
-      combined.push(...posts.map(p => ({ ...p, type: 'post' as const })));
+    if (rawPosts) {
+      combined.push(...rawPosts.map(p => ({ ...mapDbPostToPost(p), type: 'post' as const })));
     }
-    
-    // Sort by creation/start time, descending. Live streams get a boost.
+
     return combined.sort((a, b) => {
       const aTime = a.type === 'stream' ? a.startTime : a.createdAt;
       const bTime = b.type === 'stream' ? b.startTime : b.createdAt;
-      
-      // Give live streams priority
+
       if (a.type === 'stream' && a.live && (b.type !== 'stream' || !b.live)) return -1;
       if (b.type === 'stream' && b.live && (a.type !== 'stream' || !a.live)) return 1;
 
-      const aTimestamp = aTime?.seconds || 0;
-      const bTimestamp = bTime?.seconds || 0;
-      
-      return bTimestamp - aTimestamp;
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
     });
-
-  }, [streams, posts]);
+  }, [rawStreams, rawPosts]);
 
   const isLoading = isLoadingStreams || isLoadingPosts;
 
@@ -90,5 +78,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

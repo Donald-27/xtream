@@ -11,25 +11,22 @@ import {
   Sparkles, 
   Zap, 
   Globe, 
-  Heart, 
-  Trophy, 
-  MessageCircle, 
-  Bell, 
   Star,
   Smartphone,
   Tv,
   Tablet,
   Monitor,
-  Download,
   Apple,
   ChevronRight,
   CheckCircle2,
   TrendingUp,
   Clock,
-  Gift
+  Heart,
+  MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const features = [
   {
@@ -117,7 +114,7 @@ const testimonials = [
     name: 'James Wilson',
     role: 'Music Producer',
     avatar: 'https://picsum.photos/seed/james/100/100',
-    content: 'Finally a platform that understands creators. The monetization options and analytics are top-notch.',
+    content: 'Finally a platform that understands creators. The features and analytics are top-notch.',
     rating: 5,
   },
 ];
@@ -130,10 +127,10 @@ const platforms = [
   { name: 'Desktop', icon: Monitor, store: 'Web App' },
 ];
 
-const premiumFeatures = [
+const freeFeatures = [
   { title: 'HD Streaming', description: 'Stream in 1080p quality' },
-  { title: 'Priority Support', description: '24/7 dedicated support team' },
-  { title: 'Exclusive Badges', description: 'Stand out with premium badges' },
+  { title: 'Unlimited Streams', description: 'Go live as often as you want' },
+  { title: 'Full Chat Access', description: 'Engage with your community' },
   { title: 'Analytics Dashboard', description: 'Deep insights into your audience' },
   { title: 'Custom Emotes', description: 'Create your own emotes' },
   { title: 'Ad-Free Viewing', description: 'Enjoy uninterrupted streams' },
@@ -142,16 +139,13 @@ const premiumFeatures = [
 export function FeaturesSection() {
   return (
     <section className="w-full">
-      {/* Hero Section with Animation */}
       <div className="relative min-h-[80vh] flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
-        {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/10 to-accent/10 rounded-full blur-3xl" />
         </div>
         
-        {/* Floating Elements Animation */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-[10%] w-3 h-3 bg-primary rounded-full animate-bounce" style={{ animationDuration: '3s' }} />
           <div className="absolute top-40 right-[15%] w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
@@ -162,7 +156,7 @@ export function FeaturesSection() {
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <LogoIcon width={120} height={120} />
+              <LogoIcon width={150} height={150} />
               <div className="absolute inset-0 bg-primary/30 rounded-full blur-2xl -z-10 animate-pulse" />
             </div>
           </div>
@@ -179,17 +173,20 @@ export function FeaturesSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all transform hover:scale-105">
-              <Sparkles className="mr-2 h-5 w-5" />
-              Get Started Free
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:bg-card transition-all">
-              <Play className="mr-2 h-5 w-5" />
-              Watch Demo
-            </Button>
+            <Link href="/signup">
+              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all transform hover:scale-105">
+                <Sparkles className="mr-2 h-5 w-5" />
+                Get Started Free
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:bg-card transition-all">
+                <Play className="mr-2 h-5 w-5" />
+                Sign In
+              </Button>
+            </Link>
           </div>
 
-          {/* App Download Buttons */}
           <div className="flex flex-col items-center gap-4">
             <p className="text-sm text-muted-foreground">Download the app for the best experience</p>
             <div className="flex flex-wrap gap-3 justify-center">
@@ -213,13 +210,11 @@ export function FeaturesSection() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <ChevronRight className="h-8 w-8 text-muted-foreground rotate-90" />
         </div>
       </div>
 
-      {/* Video Showcase Section */}
       <div className="relative bg-gradient-to-b from-background via-card to-background py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -254,7 +249,6 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="py-16 px-4 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -273,7 +267,6 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Features Grid */}
       <div className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -293,7 +286,6 @@ export function FeaturesSection() {
                 className="group relative p-6 rounded-2xl bg-card border border-border/60 hover:border-primary/50 transition-all duration-500 hover:shadow-lg hover:shadow-primary/10 overflow-hidden"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Gradient Background on Hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
                 
                 <div className="relative z-10">
@@ -313,7 +305,6 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Platform Availability */}
       <div className="py-20 px-4 bg-card">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -339,7 +330,6 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* How It Works */}
       <div className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -352,7 +342,6 @@ export function FeaturesSection() {
           </div>
 
           <div className="relative">
-            {/* Connection Line */}
             <div className="hidden sm:block absolute top-24 left-1/2 -translate-x-1/2 w-2/3 h-0.5 bg-gradient-to-r from-primary via-accent to-primary" />
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
@@ -375,7 +364,6 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Testimonials */}
       <div className="py-20 px-4 bg-gradient-to-b from-background to-card">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -411,25 +399,25 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Premium Features */}
       <div className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-6">
-                <Trophy className="h-4 w-4" />
-                Premium
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-500 text-sm font-semibold mb-6">
+                <Heart className="h-4 w-4" />
+                100% Free
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                Unlock Your Full <span className="gradient-text">Potential</span>
+                Completely <span className="gradient-text">Free Forever</span>
               </h2>
               <p className="text-muted-foreground mb-8">
-                Upgrade to Premium and get access to exclusive features, priority support, and more.
+                Xtream is completely free to use. All features, no hidden costs, no premium tiers. 
+                We believe great streaming should be accessible to everyone.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                {premiumFeatures.map((feature, index) => (
+                {freeFeatures.map((feature, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-semibold text-foreground">{feature.title}</h4>
                       <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -437,28 +425,29 @@ export function FeaturesSection() {
                   </div>
                 ))}
               </div>
-              <Button size="lg" className="bg-gradient-to-r from-accent to-primary hover:opacity-90">
-                <Gift className="mr-2 h-5 w-5" />
-                Upgrade to Premium
-              </Button>
+              <Link href="/signup">
+                <Button size="lg" className="bg-gradient-to-r from-green-500 to-primary hover:opacity-90">
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Join for Free
+                </Button>
+              </Link>
             </div>
             <div className="relative">
               <div className="relative aspect-square rounded-2xl overflow-hidden border border-border/60">
                 <Image
-                  src="https://picsum.photos/seed/premium/600/600"
-                  alt="Premium Features"
+                  src="https://picsum.photos/seed/free/600/600"
+                  alt="Free Features"
                   fill
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
               </div>
-              {/* Floating Cards */}
               <div className="absolute -top-4 -right-4 p-4 rounded-xl bg-card border border-border/60 shadow-xl">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="h-8 w-8 text-green-500" />
                   <div>
-                    <div className="text-2xl font-bold text-foreground">+250%</div>
-                    <div className="text-sm text-muted-foreground">Engagement</div>
+                    <div className="text-2xl font-bold text-foreground">$0</div>
+                    <div className="text-sm text-muted-foreground">Forever</div>
                   </div>
                 </div>
               </div>
@@ -476,33 +465,35 @@ export function FeaturesSection() {
         </div>
       </div>
 
-      {/* Final CTA */}
       <div className="py-20 px-4 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center mb-6">
-            <LogoIcon width={100} height={100} />
+            <LogoIcon width={120} height={120} />
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold mb-6">
             Ready to Start <span className="gradient-text">Streaming</span>?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join millions of creators and viewers on Xtream. It&apos;s free to get started.
+            Join millions of creators and viewers on Xtream. It&apos;s completely free.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 transform hover:scale-105 transition-all">
-              Create Your Account
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:bg-card">
-              Continue in Browser
-            </Button>
+            <Link href="/signup">
+              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 transform hover:scale-105 transition-all">
+                Create Your Account
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6 hover:bg-card">
+                Sign In
+              </Button>
+            </Link>
           </div>
           <p className="text-sm text-muted-foreground mt-8">
-            No credit card required. Start streaming in minutes.
+            No credit card required. No hidden fees. Free forever.
           </p>
         </div>
       </div>
 
-      {/* Footer Note */}
       <div className="py-8 px-4 text-center">
         <p className="text-xs text-muted-foreground">
           We only collect essential data for functionality. Your privacy matters. 

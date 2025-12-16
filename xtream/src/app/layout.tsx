@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { FirebaseClientProvider } from '@/firebase';
+import { SupabaseProvider } from '@/lib/supabase/provider';
 import { Space_Grotesk } from 'next/font/google';
 
 const spaceGrotesk = Space_Grotesk({
@@ -23,9 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased">
-        <FirebaseClientProvider>
+        <SupabaseProvider>
           {children}
-        </FirebaseClientProvider>
+        </SupabaseProvider>
         <Toaster />
       </body>
     </html>
